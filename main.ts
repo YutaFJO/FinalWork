@@ -4,6 +4,7 @@ namespace SpriteKind {
     export const Info = SpriteKind.create()
     export const Item = SpriteKind.create()
 }
+// アイテムに触れたら入手する
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Item, function (sprite, otherSprite) {
     music.baDing.play()
     if (otherSprite == Axe) {
@@ -130,6 +131,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Item, function (sprite, otherSpr
         HaveOrbB = 1
     }
 })
+// 階段に触れたら位置を移動(上り)
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairNorth, function (sprite, location) {
     Moving = false
     controller.moveSprite(PlayerChara, 0, 0)
@@ -138,6 +140,7 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairNorth, function (spr
     Moving = true
     CallPlayer(43, 29)
 })
+// シーン変更時の演出
 function ChangeScene () {
     pause(200)
     Blackout = sprites.create(assets.image`Blackout`, SpriteKind.Info)
@@ -145,6 +148,7 @@ function ChangeScene () {
     pause(200)
     Blackout.destroy()
 }
+// 敵機の呼び出し
 function CallEnemy () {
     Enemy1 = sprites.create(img`
         ......ffff..............
@@ -827,6 +831,7 @@ function CallEnemy () {
     Enemy7.setVelocity(randint(20, 50), randint(20, 60))
     Enemy7.setFlag(SpriteFlag.BounceOnWall, true)
 }
+// ボタンを踏んだら種類に応じてイベントが発生
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Gimmick, function (sprite, otherSprite) {
     if (otherSprite == Button1) {
         if (CrushRock == 0) {
@@ -1040,6 +1045,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Gimmick, function (sprite, other
         }
     }
 })
+// 穴に落ちたら2ステージに進む
 scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles10, function (sprite, location) {
     PlayerChara.destroy()
     pause(500)
@@ -1049,11 +1055,13 @@ scene.onOverlapTile(SpriteKind.Player, sprites.builtin.forestTiles10, function (
         ChangeScene()
     }
 })
+// Bボタンを押すと、1,2ステージなら持ち物を表示
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (Forest == 2 || Underground == 2) {
         game.showLongText(Text, DialogLayout.Full)
     }
 })
+// 2ステージから移った時の2ステージ内スプライトの破壊と、自機がやられた時の3ステージの状況リセット
 function FieldReset () {
     MagicRock.destroy()
     Treasure3.destroy()
@@ -1076,6 +1084,7 @@ function FieldReset () {
     OpenGoal = 0
     Miss = 0
 }
+// 障害物やその他の物体に触れたら種類に応じてイベントが
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Object, function (sprite, otherSprite) {
     if (otherSprite == Tree) {
         if (HaveAxe == 1) {
@@ -1169,6 +1178,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Object, function (sprite, otherS
         game.over(true, effects.confetti)
     }
 })
+// 階段に触れたら位置を移動(下り)
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairSouth, function (sprite, location) {
     Moving = false
     controller.moveSprite(PlayerChara, 0, 0)
@@ -1177,10 +1187,12 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairSouth, function (spr
     Moving = true
     CallPlayer(44, 17)
 })
+// 自機の呼び出し
 function CallPlayer (TileX: number, TileY: number) {
     PlayerChara = sprites.create(assets.image`PlayerFront`, SpriteKind.Player)
     tiles.placeOnTile(PlayerChara, tiles.getTileLocation(TileX, TileY))
 }
+// 敵機に触れたら3ステージの最初から
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     if (Miss == 0) {
         Moving = false
@@ -1205,6 +1217,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         Field = 1
     }
 })
+// Aボタンを押すと、
+// ・タイトル画面ならゲーム開始
+// ・3ステージなら看板を見る
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (TitleScene == 0) {
         Title.destroy()
@@ -1217,6 +1232,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         }
     }
 })
+// タイトル画面の設定
 let BoardText = ""
 let SignBoard2: Sprite = null
 let SignBoard1: Sprite = null
@@ -2950,12 +2966,14 @@ forever(function () {
         }
     }
 })
+// 自機の移動の可不可
 forever(function () {
     if (Moving == true) {
         controller.moveSprite(PlayerChara, 150, 150)
         scene.cameraFollowSprite(PlayerChara)
     }
 })
+// 看板の種類におうじて表示テキストが変化
 forever(function () {
     if (Field == 2) {
         if (PlayerChara.overlapsWith(SignBoard1)) {
@@ -3206,6 +3224,7 @@ forever(function () {
         Forest = 2
     }
 })
+// ステージや持ち物の状況に応じて表示するテキストが変化
 forever(function () {
     if (Forest == 2) {
         if (HaveAxe == 1 && HaveLight == 1) {
